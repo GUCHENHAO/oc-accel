@@ -24,7 +24,7 @@ create_project action_ip_prj $aip_dir/action_ip_prj -force -part $fpga_part -ip 
 puts "                        Generating axi_dwidth_converter ......"
 create_ip -name axi_dwidth_converter -vendor xilinx.com -library ip -version 2.1 -module_name axi_dwidth_converter_0 >> $log_file
 set_property -dict [list CONFIG.ADDR_WIDTH {64} CONFIG.SI_DATA_WIDTH {128} CONFIG.MI_DATA_WIDTH {1024}] [get_ips axi_dwidth_converter_0]
-
+set_property generate_synth_checkpoint false [get_files $src_dir/axi_dwidth_converter_0/axi_dwidth_converter_0.xci] >> $log_file
 generate_target all [get_files $src_dir/axi_dwidth_converter_0/axi_dwidth_converter_0.xci] >> $log_file
 close_project
 
