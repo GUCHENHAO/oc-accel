@@ -6,6 +6,7 @@
 
 module action_h265enc_top #(
     parameter ID_WIDTH = 1,
+	parameter USER_WIDTH =9,
     parameter LITE_DWIDTH = 32,
     parameter LITE_AWIDTH = 32,
     parameter HOST_DWIDTH = 1024,
@@ -93,19 +94,8 @@ module action_h265enc_top #(
         input                           m_axi_snap_rvalid
 );
 
-    wire    [PINFO_WIDTH-1:0]       process_info_w  ;
-    wire                            process_start_w ;
-    wire                            process_ready_w ;
-    wire                            dsc0_pull_w     ;
-    wire                            dsc0_ready_w    ;
-    wire    [HOST_DWIDTH-1:0]       dsc0_data_w     ;
-    wire                            complete_push_w ;
-    wire    [RETURN_WIDTH-1:0]      return_data_w   ;
-    wire                            complete_ready_w;
-    wire    [31:0]                  cmpl_ram_data_w ;
-    wire    [PASID_WIDTH-1:0]       cmpl_ram_addr_w ;
-    wire                            cmpl_ram_hi_w   ;
-    wire                            cmpl_ram_lo_w   ;
+parameter ENC_AWIDTH = 'd64;
+parameter ENC_DWIDTH = 'd128;
 
 	// AXI write address channel
     wire                            enc_m_axi_awid;
@@ -155,6 +145,9 @@ module action_h265enc_top #(
 
 assign o_interrupt = 1'b0;
 assign m_axi_snap_awuser = 'd0;
+assign m_axi_snap_aruser = 'd0;
+assign m_axi_snap_awid = 'd0;
+assign m_axi_snap_arid = 'd0;
 
 //h265enc
     enc_top enctop0(
@@ -182,11 +175,11 @@ assign m_axi_snap_awuser = 'd0;
   // axi_m
         .axi_m_arready_i            ( enc_m_axi_arready ),
         .axi_m_awready_i            ( enc_m_axi_awready ),
-        .axi_m_bid_i                ( enc_m_axi_bid     ),
+        .axi_m_bid_i                ( 'd0               ),
         .axi_m_bresp_i              ( enc_m_axi_bresp   ),
         .axi_m_bvalid_i             ( enc_m_axi_bvalid  ),
         .axi_m_rdata_i              ( enc_m_axi_rdata   ),
-        .axi_m_rid_i                ( enc_m_axi_rid     ),
+        .axi_m_rid_i                ( 'd0               ),
         .axi_m_rlast_i              ( enc_m_axi_rlast   ),
         .axi_m_rresp_i              ( enc_m_axi_rresp   ),
         .axi_m_rvalid_i             ( enc_m_axi_rvalid  ),
@@ -194,7 +187,7 @@ assign m_axi_snap_awuser = 'd0;
         .axi_m_araddr_o             ( enc_m_axi_araddr  ),
         .axi_m_arburst_o            ( enc_m_axi_arburst ),
         .axi_m_arcache_o            ( enc_m_axi_arcache ),
-        .axi_m_arid_o               ( enc_m_axi_arid    ),
+        .axi_m_arid_o               (                   ),
         .axi_m_arlen_o              ( enc_m_axi_arlen   ),
         .axi_m_arlock_o             ( enc_m_axi_arlock  ),
         .axi_m_arprot_o             ( enc_m_axi_arprot  ),
@@ -203,7 +196,7 @@ assign m_axi_snap_awuser = 'd0;
         .axi_m_awaddr_o             ( enc_m_axi_awaddr  ),
         .axi_m_awburst_o            ( enc_m_axi_awburst ),
         .axi_m_awcache_o            ( enc_m_axi_awcache ),
-        .axi_m_awid_o               ( enc_m_axi_awid    ),
+        .axi_m_awid_o               (                   ),
         .axi_m_awlen_o              ( enc_m_axi_awlen   ),
         .axi_m_awlock_o             ( enc_m_axi_awlock  ),
         .axi_m_awprot_o             ( enc_m_axi_awprot  ),
@@ -219,89 +212,76 @@ assign m_axi_snap_awuser = 'd0;
     );
 
 //1-to-1 AXI MM interconnect
-    axi_dwidth_converter    axi_mm_X (
-        .INTERCONNECT_ACLK          ( clk               ),
-        .INTERCONNECT_ARESETN       ( rst_n             ),
+    axi_dwidth_converter_0  axi_mm_x (
+        .s_axi_aresetn            ( rst_n             ),
+        .s_axi_aclk               ( clk               ),
+        .s_axi_awaddr             ( enc_m_axi_awaddr  ),
+        .s_axi_awlen              ( enc_m_axi_awlen   ),
+        .s_axi_awsize             ( enc_m_axi_awsize  ),
+        .s_axi_awburst            ( enc_m_axi_awburst ),
+        .s_axi_awlock             ( enc_m_axi_awlock  ),
+        .s_axi_awcache            ( enc_m_axi_awcache ),
+        .s_axi_awprot             ( enc_m_axi_awprot  ),
+        .s_axi_awqos              ( enc_m_axi_awqos   ),
+        .s_axi_awvalid            ( enc_m_axi_awvalid ),
+        .s_axi_awready            ( enc_m_axi_awready ),
+        .s_axi_wdata              ( enc_m_axi_wdata   ),
+        .s_axi_wstrb              ( enc_m_axi_wstrb   ),
+        .s_axi_wlast              ( enc_m_axi_wlast   ),
+        .s_axi_wvalid             ( enc_m_axi_wvalid  ),
+        .s_axi_wready             ( enc_m_axi_wready  ),
+        .s_axi_bresp              ( enc_m_axi_bresp   ),
+        .s_axi_bvalid             ( enc_m_axi_bvalid  ),
+        .s_axi_bready             ( enc_m_axi_bready  ),
+        .s_axi_araddr             ( enc_m_axi_araddr  ),
+        .s_axi_arlen              ( enc_m_axi_arlen   ),
+        .s_axi_arsize             ( enc_m_axi_arsize  ),
+        .s_axi_arburst            ( enc_m_axi_arburst ),
+        .s_axi_arlock             ( enc_m_axi_arlock  ),
+        .s_axi_arcache            ( enc_m_axi_arcache ),
+        .s_axi_arprot             ( enc_m_axi_arprot  ),
+        .s_axi_arqos              ( enc_m_axi_arqos   ),
+        .s_axi_arvalid            ( enc_m_axi_arvalid ),
+        .s_axi_arready            ( enc_m_axi_arready ),
+        .s_axi_rdata              ( enc_m_axi_rdata   ),
+        .s_axi_rresp              ( enc_m_axi_rresp   ),
+        .s_axi_rlast              ( enc_m_axi_rlast   ),
+        .s_axi_rvalid             ( enc_m_axi_rvalid  ),
+        .s_axi_rready             ( enc_m_axi_rready  ),
 
-        .S00_AXI_ARESET_OUT_N       (                   ),
-        .S00_AXI_ACLK               ( clk               ),
-        .S00_AXI_AWID               ( enc_m_axi_awid    ),
-        .S00_AXI_AWADDR             ( enc_m_axi_awaddr  ),
-        .S00_AXI_AWLEN              ( enc_m_axi_awlen   ),
-        .S00_AXI_AWSIZE             ( enc_m_axi_awsize  ),
-        .S00_AXI_AWBURST            ( enc_m_axi_awburst ),
-        .S00_AXI_AWLOCK             ( enc_m_axi_awlock  ),
-        .S00_AXI_AWCACHE            ( enc_m_axi_awcache ),
-        .S00_AXI_AWPROT             ( enc_m_axi_awprot  ),
-        .S00_AXI_AWQOS              ( enc_m_axi_awqos   ),
-        .S00_AXI_AWVALID            ( enc_m_axi_awvalid ),
-        .S00_AXI_AWREADY            ( enc_m_axi_awready ),
-        .S00_AXI_WDATA              ( enc_m_axi_wdata   ),
-        .S00_AXI_WSTRB              ( enc_m_axi_wstrb   ),
-        .S00_AXI_WLAST              ( enc_m_axi_wlast   ),
-        .S00_AXI_WVALID             ( enc_m_axi_wvalid  ),
-        .S00_AXI_WREADY             ( enc_m_axi_wready  ),
-        .S00_AXI_BID                ( enc_m_axi_bid     ),
-        .S00_AXI_BRESP              ( enc_m_axi_bresp   ),
-        .S00_AXI_BVALID             ( enc_m_axi_bvalid  ),
-        .S00_AXI_BREADY             ( enc_m_axi_bready  ),
-        .S00_AXI_ARID               ( enc_m_axi_arid    ),
-        .S00_AXI_ARADDR             ( enc_m_axi_araddr  ),
-        .S00_AXI_ARLEN              ( enc_m_axi_arlen   ),
-        .S00_AXI_ARSIZE             ( enc_m_axi_arsize  ),
-        .S00_AXI_ARBURST            ( enc_m_axi_arburst ),
-        .S00_AXI_ARLOCK             ( enc_m_axi_arlock  ),
-        .S00_AXI_ARCACHE            ( enc_m_axi_arcache ),
-        .S00_AXI_ARPROT             ( enc_m_axi_arprot  ),
-        .S00_AXI_ARQOS              ( enc_m_axi_arqos   ),
-        .S00_AXI_ARVALID            ( enc_m_axi_arvalid ),
-        .S00_AXI_ARREADY            ( enc_m_axi_arready ),
-        .S00_AXI_RID                ( enc_m_axi_rid     ),
-        .S00_AXI_RDATA              ( enc_m_axi_rdata   ),
-        .S00_AXI_RRESP              ( enc_m_axi_rresp   ),
-        .S00_AXI_RLAST              ( enc_m_axi_rlast   ),
-        .S00_AXI_RVALID             ( enc_m_axi_rvalid  ),
-        .S00_AXI_RREADY             ( enc_m_axi_rready  ),
-
-        .M00_AXI_ARESET_OUT_N       (                   ),
-        .M00_AXI_ACLK               ( clk               ),
-        .M00_AXI_AWID               ( m_axi_snap_awid   ),
-        .M00_AXI_AWADDR             ( m_axi_snap_awaddr ),
-        .M00_AXI_AWLEN              ( m_axi_snap_awlen  ),
-        .M00_AXI_AWSIZE             ( m_axi_snap_awsize ),
-        .M00_AXI_AWBURST            ( m_axi_snap_awburst),
-        .M00_AXI_AWLOCK             ( m_axi_snap_awlock ),
-        .M00_AXI_AWCACHE            ( m_axi_snap_awcache),
-        .M00_AXI_AWPROT             ( m_axi_snap_awprot ),
-        .M00_AXI_AWQOS              ( m_axi_snap_awqos  ),
-        .M00_AXI_AWVALID            ( m_axi_snap_awvalid),
-        .M00_AXI_AWREADY            ( m_axi_snap_awready),
-        .M00_AXI_WDATA              ( m_axi_snap_wdata  ),
-        .M00_AXI_WSTRB              ( m_axi_snap_wstrb  ),
-        .M00_AXI_WLAST              ( m_axi_snap_wlast  ),
-        .M00_AXI_WVALID             ( m_axi_snap_wvalid ),
-        .M00_AXI_WREADY             ( m_axi_snap_wready ),
-        .M00_AXI_BID                ( m_axi_snap_bid    ),
-        .M00_AXI_BRESP              ( m_axi_snap_bresp  ),
-        .M00_AXI_BVALID             ( m_axi_snap_bvalid ),
-        .M00_AXI_BREADY             ( m_axi_snap_bready ),
-        .M00_AXI_ARID               ( m_axi_snap_arid   ),
-        .M00_AXI_ARADDR             ( m_axi_snap_araddr ),
-        .M00_AXI_ARLEN              ( m_axi_snap_arlen  ),
-        .M00_AXI_ARSIZE             ( m_axi_snap_arsize ),
-        .M00_AXI_ARBURST            ( m_axi_snap_arburst),
-        .M00_AXI_ARLOCK             ( m_axi_snap_arlock ),
-        .M00_AXI_ARCACHE            ( m_axi_snap_arcache),
-        .M00_AXI_ARPROT             ( m_axi_snap_arprot ),
-        .M00_AXI_ARQOS              ( m_axi_snap_arqos  ),
-        .M00_AXI_ARVALID            ( m_axi_snap_arvalid),
-        .M00_AXI_ARREADY            ( m_axi_snap_arready),
-        .M00_AXI_RID                ( m_axi_snap_rid    ),
-        .M00_AXI_RDATA              ( m_axi_snap_rdata  ),
-        .M00_AXI_RRESP              ( m_axi_snap_rresp  ),
-        .M00_AXI_RLAST              ( m_axi_snap_rlast  ),
-        .M00_AXI_RVALID             ( m_axi_snap_rvalid ),
-        .M00_AXI_RREADY             ( m_axi_snap_rready )
+        .m_axi_awaddr             ( m_axi_snap_awaddr ),
+        .m_axi_awlen              ( m_axi_snap_awlen  ),
+        .m_axi_awsize             ( m_axi_snap_awsize ),
+        .m_axi_awburst            ( m_axi_snap_awburst),
+        .m_axi_awlock             ( m_axi_snap_awlock ),
+        .m_axi_awcache            ( m_axi_snap_awcache),
+        .m_axi_awprot             ( m_axi_snap_awprot ),
+        .m_axi_awqos              ( m_axi_snap_awqos  ),
+        .m_axi_awvalid            ( m_axi_snap_awvalid),
+        .m_axi_awready            ( m_axi_snap_awready),
+        .m_axi_wdata              ( m_axi_snap_wdata  ),
+        .m_axi_wstrb              ( m_axi_snap_wstrb  ),
+        .m_axi_wlast              ( m_axi_snap_wlast  ),
+        .m_axi_wvalid             ( m_axi_snap_wvalid ),
+        .m_axi_wready             ( m_axi_snap_wready ),
+        .m_axi_bresp              ( m_axi_snap_bresp  ),
+        .m_axi_bvalid             ( m_axi_snap_bvalid ),
+        .m_axi_bready             ( m_axi_snap_bready ),
+        .m_axi_araddr             ( m_axi_snap_araddr ),
+        .m_axi_arlen              ( m_axi_snap_arlen  ),
+        .m_axi_arsize             ( m_axi_snap_arsize ),
+        .m_axi_arburst            ( m_axi_snap_arburst),
+        .m_axi_arlock             ( m_axi_snap_arlock ),
+        .m_axi_arcache            ( m_axi_snap_arcache),
+        .m_axi_arprot             ( m_axi_snap_arprot ),
+        .m_axi_arqos              ( m_axi_snap_arqos  ),
+        .m_axi_arvalid            ( m_axi_snap_arvalid),
+        .m_axi_arready            ( m_axi_snap_arready),
+        .m_axi_rdata              ( m_axi_snap_rdata  ),
+        .m_axi_rresp              ( m_axi_snap_rresp  ),
+        .m_axi_rlast              ( m_axi_snap_rlast  ),
+        .m_axi_rvalid             ( m_axi_snap_rvalid ),
+        .m_axi_rready             ( m_axi_snap_rready )
         );
 
 endmodule

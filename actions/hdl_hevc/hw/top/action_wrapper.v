@@ -21,8 +21,6 @@
 `timescale 1ns/1ps
 
 (* KEEP_HIERARCHY = "yes" *) module action_wrapper #(
-    parameter ENGINE_NUM = NUM_ENGINES,
-
     // Parameters of Axi Slave Bus Interface AXI_CTRL_REG
     parameter C_S_AXI_CTRL_REG_DATA_WIDTH    = 32,
     parameter C_S_AXI_CTRL_REG_ADDR_WIDTH    = 32,
@@ -113,14 +111,12 @@
     output m_axi_host_mem_wvalid
     );
 
-    wire [7:0] num_engines;
     wire [7:0] version;
     wire [31:0] action_version;
 
-    assign num_engines = ENGINE_NUM;
     assign version = 8'h01;
 
-    assign action_version = {8'h0, 8'h0, num_engines, version};
+    assign action_version = {8'h0, 8'h0, 8'h0, version};
 
     // Make wuser stick to 0
     assign m_axi_host_mem_wuser = 0;
