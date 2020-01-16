@@ -6,7 +6,7 @@
 
 module action_h265enc_top #(
     parameter ID_WIDTH = 1,
-	parameter USER_WIDTH =9,
+    parameter USER_WIDTH =9,
     parameter LITE_DWIDTH = 32,
     parameter LITE_AWIDTH = 32,
     parameter HOST_DWIDTH = 1024,
@@ -14,10 +14,10 @@ module action_h265enc_top #(
 )(
         input                           clk                 ,
         input                           rst_n               ,
-		input       [31:0]              i_action_type       ,
-		input       [31:0]              i_action_version    ,
-		output                          o_interrupt         ,
-		input                           i_interrupt_ack     ,
+        input       [31:0]              i_action_type       ,
+        input       [31:0]              i_action_version    ,
+        output                          o_interrupt         ,
+        input                           i_interrupt_ack     ,
 
         //---- AXI Lite bus----
           // AXI write address channel
@@ -60,7 +60,7 @@ module action_h265enc_top #(
         output                          m_axi_snap_awvalid  ,
         input                           m_axi_snap_awready  ,
         // AXI write data channel
-        output      [ID_WIDTH-1:0]      m_axi_snap_wid      ,
+        //output      [ID_WIDTH-1:0]      m_axi_snap_wid      ,
         output      [HOST_DWIDTH-1:0]   m_axi_snap_wdata    ,
         output      [HOST_DWIDTH/8-1:0] m_axi_snap_wstrb    ,
         output                          m_axi_snap_wlast    ,
@@ -97,8 +97,8 @@ module action_h265enc_top #(
 parameter ENC_AWIDTH = 'd64;
 parameter ENC_DWIDTH = 'd128;
 
-	// AXI write address channel
-    wire                            enc_m_axi_awid;
+    // AXI write address channel
+    //wire                            enc_m_axi_awid;
     wire    [ENC_AWIDTH -1 :0]      enc_m_axi_awaddr;
     wire    [0007:0]                enc_m_axi_awlen;
     wire    [0002:0]                enc_m_axi_awsize;
@@ -107,11 +107,11 @@ parameter ENC_DWIDTH = 'd128;
     wire                            enc_m_axi_awlock;
     wire    [0002:0]                enc_m_axi_awprot;
     wire    [0003:0]                enc_m_axi_awqos;
-    wire    [0003:0]                enc_m_axi_awregion;
+    //wire    [0003:0]                enc_m_axi_awregion;
     wire                            enc_m_axi_awvalid;
     wire                            enc_m_axi_awready;
     // AXI write data channel
-    wire                            enc_m_axi_wid;
+    //wire                            enc_m_axi_wid;
     wire    [ENC_DWIDTH -1 :0]      enc_m_axi_wdata;
     wire    [ENC_DWIDTH/8-1 :0]     enc_m_axi_wstrb;
     wire                            enc_m_axi_wlast;
@@ -119,11 +119,11 @@ parameter ENC_DWIDTH = 'd128;
     wire                            enc_m_axi_wready;
     // AXI write response channel
     wire                            enc_m_axi_bready;
-    wire                            enc_m_axi_bid;
+    //wire                            enc_m_axi_bid;
     wire    [1:0]                   enc_m_axi_bresp;
     wire                            enc_m_axi_bvalid;
     // AXI read address channel
-    wire                            enc_m_axi_arid;
+    //wire                            enc_m_axi_arid;
     wire    [ENC_AWIDTH-1:0]        enc_m_axi_araddr;
     wire    [0007:0]                enc_m_axi_arlen;
     wire    [0002:0]                enc_m_axi_arsize;
@@ -132,12 +132,12 @@ parameter ENC_DWIDTH = 'd128;
     wire                            enc_m_axi_arlock;
     wire    [0002:0]                enc_m_axi_arprot;
     wire    [0003:0]                enc_m_axi_arqos;
-    wire    [0003:0]                enc_m_axi_arregion;
+    //wire    [0003:0]                enc_m_axi_arregion;
     wire                            enc_m_axi_arvalid;
     wire                            enc_m_axi_arready;
     // AXI read data channel
     wire                            enc_m_axi_rready;
-    wire                            enc_m_axi_rid;
+    //wire                            enc_m_axi_rid;
     wire    [ENC_DWIDTH-1 :0]       enc_m_axi_rdata;
     wire    [1:0]                   enc_m_axi_rresp;
     wire                            enc_m_axi_rlast;
@@ -148,6 +148,10 @@ assign m_axi_snap_awuser = 'd0;
 assign m_axi_snap_aruser = 'd0;
 assign m_axi_snap_awid = 'd0;
 assign m_axi_snap_arid = 'd0;
+assign m_axi_snap_awregion = 'd0;
+assign m_axi_snap_arregion = 'd0;
+assign enc_m_axi_arqos = 'd0;
+assign enc_m_axi_awqos = 'd0;
 
 //h265enc
     enc_top enctop0(
@@ -205,7 +209,7 @@ assign m_axi_snap_arid = 'd0;
         .axi_m_bready_o             ( enc_m_axi_bready  ),
         .axi_m_rready_o             ( enc_m_axi_rready  ),
         .axi_m_wdata_o              ( enc_m_axi_wdata   ),
-        .axi_m_wid_o                ( enc_m_axi_wid     ),
+        .axi_m_wid_o                (                   ),
         .axi_m_wlast_o              ( enc_m_axi_wlast   ),
         .axi_m_wstrb_o              ( enc_m_axi_wstrb   ),
         .axi_m_wvalid_o             ( enc_m_axi_wvalid  )

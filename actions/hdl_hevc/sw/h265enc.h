@@ -30,22 +30,22 @@
 #define QP                      0x00000016
 #define X_TOTAL                 (FRAMEWIDTH /64)-1
 #define Y_TOTAL                 (FRAMEHEIGHT /64)-1
-#define REC_0_BASE              (FRAMEWIDTH*FRAMEHEIGHT*3/2)*1 
+#define REC_0_BASE              (FRAMEWIDTH*FRAMEHEIGHT*3/2)*1
 #define REC_1_BASE              (FRAMEWIDTH*FRAMEHEIGHT*3/2)*2
-#define ACTION_TYPE_HDL_H265ENC 0x00000001	/* Action Type */
+#define ACTION_TYPE_HDL_H265ENC 0x00000001    /* Action Type */
 
-#define REG_START               0x34	
-#define REG_X_TOTAL             0x38
-#define REG_Y_TOTAL             0x3c	
-#define REG_QP                  0x40
-#define REG_TYPE                0x44
-#define REG_ORI_BASE_HIGH       0x48
-#define REG_ORI_BASE_LOW        0x4C
-#define REG_REC_0_BASE          0x50
-#define REG_REC_1_BASE          0x54
-#define COUNT_A                 0x58
-#define SYS_DONE_I              0x5C
-#define REG_BS_BASE_HIGH        0x60
-#define REG_BS_BASE_LOW         0x64
+#define REG_START               0x100
+#define REG_X_TOTAL             0x114
+#define REG_Y_TOTAL             0x118
+#define REG_QP                  0x12C
+#define REG_TYPE                0x128
+#define REG_ORI_BASE_HIGH       0x168
+#define REG_ORI_BASE_LOW        0x16C
+#define REG_REC_0_BASE          0x178
+#define REG_REC_1_BASE          0x17C
+#define COUNT_A                 0x1A0
+#define SYS_DONE_I              0x1F8
+#define REG_BS_BASE_HIGH        0x198
+#define REG_BS_BASE_LOW         0x19C
 
-#endif	/* __SNAP_H265ENC__ */
+#endif    /* __SNAP_H265ENC__ */

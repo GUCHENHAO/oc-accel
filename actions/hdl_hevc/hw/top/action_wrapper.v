@@ -26,7 +26,7 @@
     parameter C_S_AXI_CTRL_REG_ADDR_WIDTH    = 32,
 
     // Parameters of Axi Master Bus Interface AXI_HOST_MEM ; to Host memory
-    parameter C_M_AXI_HOST_MEM_ID_WIDTH      = 5,
+    parameter C_M_AXI_HOST_MEM_ID_WIDTH      = 1,
     parameter C_M_AXI_HOST_MEM_ADDR_WIDTH    = 64,
     parameter C_M_AXI_HOST_MEM_DATA_WIDTH    = 1024,
     parameter C_M_AXI_HOST_MEM_AWUSER_WIDTH  = 9,
@@ -137,9 +137,9 @@
 
         .clk                   (ap_clk   ) ,
         .rst_n                 (ap_rst_n ) ,
-    
-        //---- AXI bus interfaced with SNAP core ----               
-        // AXI write address channel      
+
+        //---- AXI bus interfaced with SNAP core ----
+        // AXI write address channel
         .m_axi_snap_awid       (m_axi_host_mem_awid     ) ,
         .m_axi_snap_awaddr     (m_axi_host_mem_awaddr   ) ,
         .m_axi_snap_awlen      (m_axi_host_mem_awlen    ) ,
@@ -153,19 +153,19 @@
         .m_axi_snap_awuser     (m_axi_host_mem_awuser   ) ,
         .m_axi_snap_awvalid    (m_axi_host_mem_awvalid  ) ,
         .m_axi_snap_awready    (m_axi_host_mem_awready  ) ,
-        // AXI write data channel         
+        // AXI write data channel
         //.m_axi_snap_wid        (0                   ) ,
         .m_axi_snap_wdata      (m_axi_host_mem_wdata  ) ,
         .m_axi_snap_wstrb      (m_axi_host_mem_wstrb  ) ,
         .m_axi_snap_wlast      (m_axi_host_mem_wlast  ) ,
         .m_axi_snap_wvalid     (m_axi_host_mem_wvalid ) ,
         .m_axi_snap_wready     (m_axi_host_mem_wready ) ,
-        // AXI write response channel     
+        // AXI write response channel
         .m_axi_snap_bready     (m_axi_host_mem_bready ) ,
         .m_axi_snap_bid        (m_axi_host_mem_bid    ) ,
         .m_axi_snap_bresp      (m_axi_host_mem_bresp  ) ,
         .m_axi_snap_bvalid     (m_axi_host_mem_bvalid ) ,
-        // AXI read address channel       
+        // AXI read address channel
         .m_axi_snap_arid       (m_axi_host_mem_arid     ) ,
         .m_axi_snap_araddr     (m_axi_host_mem_araddr   ) ,
         .m_axi_snap_arlen      (m_axi_host_mem_arlen    ) ,
@@ -179,21 +179,21 @@
         .m_axi_snap_arregion   (m_axi_host_mem_arregion ) ,
         .m_axi_snap_arvalid    (m_axi_host_mem_arvalid  ) ,
         .m_axi_snap_arready    (m_axi_host_mem_arready  ) ,
-        // AXI  ead data channel          
+        // AXI  ead data channel
         .m_axi_snap_rready     (m_axi_host_mem_rready ) ,
         .m_axi_snap_rid        (m_axi_host_mem_rid    ) ,
         .m_axi_snap_rdata      (m_axi_host_mem_rdata  ) ,
         .m_axi_snap_rresp      (m_axi_host_mem_rresp  ) ,
         .m_axi_snap_rlast      (m_axi_host_mem_rlast  ) ,
         .m_axi_snap_rvalid     (m_axi_host_mem_rvalid ) ,
-    
-        //---- AXI Lite bus interfaced with SNAP core ----               
+
+        //---- AXI Lite bus interfaced with SNAP core ----
         // AXI write address channel
         .s_axi_snap_awready    (s_axi_ctrl_reg_awready ) ,
         .s_axi_snap_awaddr     (s_axi_ctrl_reg_awaddr  ) ,
-        .s_axi_snap_awprot     (s_axi_ctrl_reg_awprot  ) ,
+        .s_axi_snap_awprot     (                       ) , // no use
         .s_axi_snap_awvalid    (s_axi_ctrl_reg_awvalid ) ,
-        // axi write data channel             
+        // axi write data channel
         .s_axi_snap_wready     (s_axi_ctrl_reg_wready ) ,
         .s_axi_snap_wdata      (s_axi_ctrl_reg_wdata  ) ,
         .s_axi_snap_wstrb      (s_axi_ctrl_reg_wstrb  ) ,
@@ -206,7 +206,7 @@
         .s_axi_snap_arready    (s_axi_ctrl_reg_arready ) ,
         .s_axi_snap_arvalid    (s_axi_ctrl_reg_arvalid ) ,
         .s_axi_snap_araddr     (s_axi_ctrl_reg_araddr  ) ,
-        .s_axi_snap_arprot     (s_axi_ctrl_reg_arprot  ) ,
+        .s_axi_snap_arprot     (                       ) , // no use
         // AXI read data channel
         .s_axi_snap_rdata      (s_axi_ctrl_reg_rdata  ) ,
         .s_axi_snap_rresp      (s_axi_ctrl_reg_rresp  ) ,
