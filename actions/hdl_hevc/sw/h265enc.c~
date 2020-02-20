@@ -151,6 +151,8 @@ static int do_action (struct snap_card* dnc,
 
     int frame_cnt;
     uint32_t bs_length = 0 ;
+    uint32_t rec_0_base = REC_0_BASE;
+    uint32_t rec_1_base = REC_1_BASE;
 
     if ((fp1 = fopen("/afs/bb/u/lyhlu/vol2/HEVC/20181101/snap/actions/hdl_h265enc/sw/bs1.dat","wb"))==NULL) {
             VERBOSE0("ERROR: Fail to create bs1 file!\n");
@@ -162,31 +164,25 @@ static int do_action (struct snap_card* dnc,
             return -1;
     }
 
+    uint32_t reg_x_total = X_TOTAL;
+    uint32_t reg_y_total = Y_TOTAL;
+    uint32_t qp = QP;
     uint64_t addr;
 
     VERBOSE0 (" Start register config! \n");
 
     // init
     action_write(dnc, REG_FLG_IRQ, 1);
-    action_write(dnc, REG_X_TOTAL, X_TOTAL);
-    action_write(dnc, REG_Y_TOTAL, Y_TOTAL);
-    action_write(dnc, REG_FLG_SAO_LU, FLAG_SAO_LU);
-    action_write(dnc, REG_FLG_SAO_CH, FLAG_SAO_CH);
-    action_write(dnc, REG_TYP, 0);
-    action_write(dnc, REG_QP, QP);
-    action_write(dnc, REG_FTH_SRC_ORI, 0);
-    action_write(dnc, REG_RDO_DAT_04_ABC, 665 * (2^11) + 117);
-    action_write(dnc, REG_RDO_DAT_08_ABC, 645 * (2^11) +  28);
-    action_write(dnc, REG_RDO_DAT_16_ABC, 609 * (2^11) +   0);
-    action_write(dnc, REG_RDO_DAT_32_ABC, 616 * (2^11) +  11);
+    action_write(dnc, REG_X_TOTAL, reg_x_total);
+    action_write(dnc, REG_Y_TOTAL, reg_y_total);
+    action_write(dnc, REG_FLG_SAO_LU, reg_x_total);
+    action_write(dnc, REG_FLG_SAO_CH, reg_y_total);
+    action_write(dnc, REG_QP, qp);
 
     // source address
     addr = (uint64_t)src;
-    action_write(dnc, REG_ORI_LU_BASE_HIGH, (uint32_t)(addr >> 32));
-    action_write(dnc, REG_ORI_LU_BASE_LOW, (uint32_t)(addr & 0xffffffff));
-    addr = (uint64_t)src + FRAMEWIDTH * FRAMEHEIGHT ;
-    action_write(dnc, REG_ORI_CH_BASE_HIGH, (uint32_t)(addr >> 32));
-    action_write(dnc, REG_ORI_CH_BASE_LOW, (uint32_t)(addr & 0xffffffff));
+    action_write(dnc, REG_ORI_BASE_HIGH, (uint32_t)(addr >> 32));
+    action_write(dnc, REG_ORI_BASE_LOW, (uint32_t)(addr & 0xffffffff));
     VERBOSE1 (" Write REG_ORI_BASE done! \n");
 
     // target address
@@ -201,43 +197,51 @@ static int do_action (struct snap_card* dnc,
     t_start = get_usec();
 
     VERBOSE1(" test!\n ");
-
     for(frame_cnt = 0; frame_cnt < 1; frame_cnt++) {
         VERBOSE0(" frame number: %d\n", frame_cnt);
 
-        action_write(dnc, REG_START, 1);
+        VERBOSE1(" test!\n ");
+        // start enc
+        if( (frame_cnt%GOP_LENGTH)==0 ) {
+            action_write(dnc, REG_TYPE, 0X00000000);
+        }
+        else {
+            action_write(dnc, REG_TYPE, 0X00000001);
+        }
+        if( ((frame_cnt%GOP_LENGTH)%2)==0 ) {
+            action_write(dnc, REG_REC_0_BASE, rec_0_base);
+            action_write(dnc, REG_REC_1_BASE, rec_1_base);
+        }
+        else {
+            action_write(dnc, REG_REC_0_BASE, rec_1_base);
+            action_write(dnc, REG_REC_1_BASE, rec_0_base);
+        }
+        action_write(dnc, REG_START, 0X00000001);
 
         // Poll status for done signal
 
-        VERBOSE0 ("Done!\n");
-        while ((action_read(dnc, REG_RUN) & 0x00000003) != 0) {
-        	;
+        VERBOSE1(" test!\n ");
+        while ((action_read(dnc, SYS_DONE_I) & 0x00000001) == 1) {
+        ;
         }
 
-        action_write(dnc, REG_FLG_IRQ, 1);
+        VERBOSE0 ("Done!\n");
+        while ((action_read(dnc, SYS_DONE_I) & 0x00000001) == 0) {
+        ;
+        }
 
         VERBOSE0 ("One frame encoded!\n");
 
         // get bs length
-        bs_length = action_read(dnc, REG_BS_LEN);
+        bs_length = action_read(dnc, COUNT_A);
         VERBOSE0 ("bs_length: 0x%x\n", bs_length);
 
         bs_write1 = fwrite(dest, 1, bs_length, fp1);
         VERBOSE0 ("The number of byte writen: %d\n",bs_write1);
 
-        for (uint32_t i = 0; i < bs_length; i++) {
-        	int ref_dat;
-        	int dut_dat;
-        	fscanf(fp2, "%d\n", &ref_dat);
-        	dut_dat = *((uint8_t *)dest + i) ;
-        	if (ref_dat != dut_dat)
-        		VERBOSE0 ("bs check error at No.%d: shoud be %d, however is %d\n", i, ref_dat, dut_dat);
-        }
-
     }
 
     fclose(fp1);
-    fclose(fp2);
 
     td = get_usec() - t_start;
     *elapsed = td;
