@@ -175,10 +175,10 @@ static int do_action (struct snap_card* dnc,
     action_write(dnc, REG_TYP, 0);
     action_write(dnc, REG_QP, QP);
     action_write(dnc, REG_FTH_SRC_ORI, 0);
-    action_write(dnc, REG_RDO_DAT_04_ABC, 665 * (2^11) + 117);
-    action_write(dnc, REG_RDO_DAT_08_ABC, 645 * (2^11) +  28);
-    action_write(dnc, REG_RDO_DAT_16_ABC, 609 * (2^11) +   0);
-    action_write(dnc, REG_RDO_DAT_32_ABC, 616 * (2^11) +  11);
+    action_write(dnc, REG_RDO_DAT_04_ABC, 0x14c875);
+    action_write(dnc, REG_RDO_DAT_08_ABC, 0x14281c);
+    action_write(dnc, REG_RDO_DAT_16_ABC, 0x130800);
+    action_write(dnc, REG_RDO_DAT_32_ABC, 0x1347f5);
 
     // source address
     addr = (uint64_t)src;
