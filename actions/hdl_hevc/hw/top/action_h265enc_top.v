@@ -101,6 +101,7 @@ parameter ENC_DWIDTH = 'd128;
     //wire                            enc_m_axi_awid;
     wire    [ENC_AWIDTH -1 :0]      enc_m_axi_awaddr;
     wire    [0007:0]                enc_m_axi_awlen;
+    wire    [0003:0]                enc_m_axi_awlen0;
     wire    [0002:0]                enc_m_axi_awsize;
     wire    [0001:0]                enc_m_axi_awburst;
     wire    [0003:0]                enc_m_axi_awcache;
@@ -126,6 +127,7 @@ parameter ENC_DWIDTH = 'd128;
     //wire                            enc_m_axi_arid;
     wire    [ENC_AWIDTH-1:0]        enc_m_axi_araddr;
     wire    [0007:0]                enc_m_axi_arlen;
+    wire    [0003:0]                enc_m_axi_arlen0;
     wire    [0002:0]                enc_m_axi_arsize;
     wire    [0001:0]                enc_m_axi_arburst;
     wire    [0003:0]                enc_m_axi_arcache;
@@ -152,6 +154,8 @@ assign m_axi_snap_awregion = 'd0;
 assign m_axi_snap_arregion = 'd0;
 assign enc_m_axi_arqos = 'd0;
 assign enc_m_axi_awqos = 'd0;
+assign enc_m_axi_awlen = {4'b0,enc_m_axi_awlen0};
+assign enc_m_axi_arlen = {4'b0,enc_m_axi_arlen0};
 
 //h265enc
     enc_top enctop0(
@@ -192,7 +196,7 @@ assign enc_m_axi_awqos = 'd0;
         .axi_m_arburst_o            ( enc_m_axi_arburst ),
         .axi_m_arcache_o            ( enc_m_axi_arcache ),
         .axi_m_arid_o               (                   ),
-        .axi_m_arlen_o              ( enc_m_axi_arlen   ),
+        .axi_m_arlen_o              ( enc_m_axi_arlen0  ),
         .axi_m_arlock_o             ( enc_m_axi_arlock  ),
         .axi_m_arprot_o             ( enc_m_axi_arprot  ),
         .axi_m_arsize_o             ( enc_m_axi_arsize  ),
@@ -201,7 +205,7 @@ assign enc_m_axi_awqos = 'd0;
         .axi_m_awburst_o            ( enc_m_axi_awburst ),
         .axi_m_awcache_o            ( enc_m_axi_awcache ),
         .axi_m_awid_o               (                   ),
-        .axi_m_awlen_o              ( enc_m_axi_awlen   ),
+        .axi_m_awlen_o              ( enc_m_axi_awlen0  ),
         .axi_m_awlock_o             ( enc_m_axi_awlock  ),
         .axi_m_awprot_o             ( enc_m_axi_awprot  ),
         .axi_m_awsize_o             ( enc_m_axi_awsize  ),
